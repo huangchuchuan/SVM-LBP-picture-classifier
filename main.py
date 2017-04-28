@@ -108,9 +108,16 @@ def main():
     score = OneVsRestClassifier(svr_rbf, n_jobs=-1).fit(train_hist_array, train_label_array).score(test_hist_array,
                                                                                                    test_label_array)  # n_jobs是cpu数量, -1代表所有
     print score
+    return score
 
 
 if __name__ == '__main__':
     n = 10
+    scores = []
     for i in range(n):
-        main()
+        s = main()
+        scores.append(s)
+    max_s = max(scores)
+    min_s = min(scores)
+    avg_s = sum(scores)/float(n)
+    print '==========\nmax: %s\nmin: %s\navg: %s' % (max_s, min_s, avg_s)
