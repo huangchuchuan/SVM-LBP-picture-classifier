@@ -88,12 +88,18 @@ def main():
     # 调整后的图片列表
     pos_file_path_list = map(lambda x: os.path.join(RESIZE_POS_IMAGE_DIR, x), os.listdir(RESIZE_POS_IMAGE_DIR))
     neg_file_path_list = map(lambda x: os.path.join(RESIZE_NEG_IMAGE_DIR, x), os.listdir(RESIZE_NEG_IMAGE_DIR))
-    # 合并数据集
-    file_path_list = pos_file_path_list + neg_file_path_list
-    label_list = [1] * len(pos_file_path_list) + [-1] * len(neg_file_path_list)
     # 切分数据集
-    train_file_list, train_label_list, test_file_list, test_label_list = split_data(file_path_list, label_list,
-                                                                                    rate=0.5)
+    train_file_list0, train_label_list0, test_file_list0, test_label_list0 = split_data(pos_file_path_list,
+                                                                                        [1] * len(pos_file_path_list),
+                                                                                        rate=0.5)
+    train_file_list1, train_label_list1, test_file_list1, test_label_list1 = split_data(neg_file_path_list,
+                                                                                        [-1] * len(neg_file_path_list),
+                                                                                        rate=0.5)
+    # 合并数据集
+    train_file_list = train_file_list0 + train_file_list1
+    train_label_list = train_label_list0 + train_label_list1
+    test_file_list = test_file_list0 + test_file_list1
+    test_label_list = test_label_list0 + test_label_list1
     # 载入图片
     train_image_array = load_images(train_file_list, width=IMG_WIDTH, height=IMG_HEIGHT)
     train_label_array = np.array(train_label_list)
@@ -101,7 +107,7 @@ def main():
     test_label_array = np.array(test_label_list)
     # 获取LBP特征
     train_hist_array = get_lbp_data(train_image_array, hist_size=256, lbp_radius=1, lbp_point=8)
-    test_hist_array = get_lbp_data(test_image_array)
+    test_hist_array = get_lbp_data(test_image_array, hist_size=256, lbp_radius=1, lbp_point=8)
     # 选取svm里面的SVR作为训练模型
     svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)  # SVC, NuSVC, SVR, NuSVR, OneClassSVM, LinearSVC, LinearSVR
     # 训练和测试
